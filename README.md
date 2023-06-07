@@ -2,7 +2,7 @@
 
 
 
-### Routes 
+### **Routes**
 
 #### `/`  
 just returns 'done'  
@@ -19,7 +19,7 @@ see the history of a specific product as json
 #### `/history/{product:id}`  
 see the price history graph of a specific product
 
-### Commands
+### **Commands**
 
 #### GeneratePriceHistory
 - `php artisan generate-price-history`  
