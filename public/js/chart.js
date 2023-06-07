@@ -17,7 +17,7 @@ window.onload = () => {
     });
 
     const data = {
-        labels: [...priceHistory.map(x => DateFormatter.format(new Date(x.created_at))), DateFormatter.format(new Date(product.updated_at))],
+        labels: [...priceHistory.map(x => DateFormatter.format(new Date(x.created_at))), 'Now'],
         datasets: [
             {
                 label: 'Price',
