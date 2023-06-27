@@ -22,10 +22,46 @@ class GenerateRandomPrices extends Command
      */
     protected $description = 'Randomly change prices on all products';
 
+    public function inRange($value, $min, $max)
+    {
+        return $value >= $min && $value <= $max;
+    }
     /**
      * Execute the console command.
      */
     public function handle()
+    {
+        $this->advanced();
+    }
+
+
+    public function advanced()
+    {
+        Product::all()->map(function ($product) {
+            $dummyCreatedAt = Carbon::now();
+
+            $action = rand(1, 10);
+            $timeMod = rand(1, 50);
+            $dummyCreatedAt = $dummyCreatedAt->addMinutes($timeMod);
+            switch ($action) {
+                case $this->inRange($action, 0, 6):
+                    $mod = rand(-1000, 1000);
+                    $product->price = $product->price + $mod;
+                    $product->save();
+
+                    $this->components->info("[$dummyCreatedAt] (+$timeMod): " . $mod);
+                    break;
+                default:
+                    //reset
+                    $this->components->info("[$dummyCreatedAt] (+$timeMod): " . 'base / reset');
+                    $product->save();
+                    break;
+            }
+        });
+    }
+
+
+    public function basic()
     {
         Product::all()->map(function ($product) {
             $timeMod = rand(1, 50);

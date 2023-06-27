@@ -51,11 +51,11 @@ Route::get('/history/{product:id}', function (Product $product) {
 function collapseAll()
 {
     return "<script>
-//expand all collapsable
-[...document.querySelectorAll('.sf-dump-toggle')].map(x=>{
-    if(x.nextSibling.classList.contains('sf-dump-compact')){
-        x.click()
-    }
-})
-</script>";
+        //expand all collapsable
+        [...document.querySelectorAll('.sf-dump-toggle')].map(x=>{
+         if(x.nextSibling.classList.contains('sf-dump-compact')){
+               x.click()
+         }
+        })
+    </script>";
 }

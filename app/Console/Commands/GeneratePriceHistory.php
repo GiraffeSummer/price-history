@@ -35,18 +35,36 @@ class GeneratePriceHistory extends Command
         Product::all()->map(function ($product) {
             //needs startofday or endofday
             //fix: genereert altijd nieuwe => hoort: alleen nieuwe te genereren als vorige ouder is als $x (6 uur)
-            $history = PriceHistory::where('product_id', '=', $product->id)
-                ->where('created_at', '>=', Carbon::now()->subHours(6))
-                ->firstOrNew([
-                    'product_id' => $product->id,
-                    'price' => $product->price
-                ]);
+            $relatedHistory = PriceHistory::where('product_id', '=', $product->id);
 
-            if ($history->exists) {
-                $this->safeInfo("Updated price:" . $history->product_id . " > " . $history->price);
+            //states:
+            // no update
+            // new
+            // update
+
+            if ($relatedHistory->count() < 1) {
+                $this->safeInfo("New Entry:" . $product->id);
+                $history = $relatedHistory
+                    ->firstOrCreate([
+                        'product_id' => $product->id,
+                        'price' => $product->price
+                    ]);
             } else {
-                dump($history);
-                $this->safeError("No update:" . $history->product_id . " > " . $history->price);
+                $history = $relatedHistory
+                    ->whereDate('created_at', '>=', Carbon::now()->subHours(6))
+                    ->firstOrNew([
+                        'product_id' => $product->id,
+                        'price' => $product->price
+                    ]);
+
+
+                // dump($history);
+                if (!$history->exists) {
+                    $this->safeInfo("Updated price:" . $history->product_id . " > " . $history->price);
+                    $history->save();
+                } else {
+                    $this->safeError("No update:" . $history->product_id . " > " . $history->price);
+                }
             }
 
             return $product;
