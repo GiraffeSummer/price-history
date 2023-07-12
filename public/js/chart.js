@@ -16,18 +16,40 @@ window.onload = () => {
         decimalSymbol: ','
     });
 
+    const labels = priceHistory.map(x => DateFormatter.format(new Date(x.created_at)))
+    //replace last entry with "Now"
+    labels.splice(priceHistory.length - 1, 1, 'Now')
+
     const data = {
-        labels: [...priceHistory.map(x => DateFormatter.format(new Date(x.created_at))), 'Now'],
-        datasets: [
-            {
-                label: 'Price',
-                data: [...priceHistory.map(x => x.price), product.price],
-                fill: false,
-                stepped: true,
-                // https://assets.camelcamelcamel.com/live-assets/3camelizer-screen-opera-dac90089e917e46c48945d313cf8c242b87a1c80a398a12f2af4a0acdc77de9b.png
-            }
-        ]
+        labels,
+        //[...priceHistory.map(x => `${DateFormatter.format(new Date(x.created_at))}`), 'Now'],
+        // https://assets.camelcamelcamel.com/live-assets/3camelizer-screen-opera-dac90089e917e46c48945d313cf8c242b87a1c80a398a12f2af4a0acdc77de9b.png
+        datasets:
+            Object.values(
+                priceHistory.reduce((carry, item, index) => {
+
+                    if (!(item.supplier_id in carry)) {
+                        carry[item.supplier_id] = {
+                            label: item.supplier.name,
+                            //make empty array of desired length
+                            data: Array(priceHistory.length - 1).fill(null),
+                            fill: false,
+                            stepped: 'before',
+                            // spanGaps: true,
+                            // segment: {
+                            //     borderColor: ctx => ctx.p0.skip || ctx.p1.skip ? 'rgb(192,75,75)' : undefined,
+                            // },
+                        }
+                    }
+
+                    //set value to correct supplier
+                    carry[item.supplier_id].data[index] = item.price;
+
+                    return carry
+                }, {})
+            )
     };
+
     const config = {
         type: 'line',
         data: data,
@@ -48,9 +70,8 @@ window.onload = () => {
                 tooltip: {
                     callbacks: {
                         label: (value) => CurrencyFormatter.format(value.raw / 100),
-                        title: (v) => null
+                        title: (v) => v.label
                     },
-
                 },
                 title: {
                     display: true,

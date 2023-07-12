@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\InventoryDetail;
 use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\PriceHistory;
@@ -32,10 +33,10 @@ class GeneratePriceHistory extends Command
         // just the basics
         // need improvement for thousands of products
         // (chunking + workers)
-        Product::all()->map(function ($product) {
+        InventoryDetail::all()->map(function (InventoryDetail $detail) {
             //needs startofday or endofday
             //fix: genereert altijd nieuwe => hoort: alleen nieuwe te genereren als vorige ouder is als $x (6 uur)
-            $relatedHistory = PriceHistory::where('product_id', '=', $product->id);
+            $relatedHistory = PriceHistory::where('product_id', '=', $detail->product_id);
 
             //states:
             // no update
@@ -43,18 +44,22 @@ class GeneratePriceHistory extends Command
             // update
 
             if ($relatedHistory->count() < 1) {
-                $this->safeInfo("New Entry:" . $product->id);
+                $this->safeInfo("New Entry:" .  $detail->product_id);
                 $history = $relatedHistory
-                    ->firstOrCreate([
-                        'product_id' => $product->id,
-                        'price' => $product->price
-                    ]);
+                    ->firstOrCreate(
+                        [
+                            'product_id' => $detail->product_id,
+                            'supplier_id' => $detail->supplier_id,
+                            'price' => $detail->price
+                        ],
+                    );
             } else {
                 $history = $relatedHistory
                     ->whereDate('created_at', '>=', Carbon::now()->subHours(6))
                     ->firstOrNew([
-                        'product_id' => $product->id,
-                        'price' => $product->price
+                        'product_id' => $detail->product_id,
+                        'supplier_id' => $detail->supplier_id,
+                        'price' => $detail->price
                     ]);
 
 
@@ -67,7 +72,7 @@ class GeneratePriceHistory extends Command
                 }
             }
 
-            return $product;
+            return $detail;
         });
     }
 }

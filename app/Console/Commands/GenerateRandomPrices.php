@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\InventoryDetail;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -37,7 +38,7 @@ class GenerateRandomPrices extends Command
 
     public function advanced()
     {
-        Product::all()->map(function ($product) {
+        InventoryDetail::all()->map(function ($detail) {
             $dummyCreatedAt = Carbon::now();
 
             $action = rand(1, 10);
@@ -46,15 +47,15 @@ class GenerateRandomPrices extends Command
             switch ($action) {
                 case $this->inRange($action, 0, 6):
                     $mod = rand(-1000, 1000);
-                    $product->price = $product->price + $mod;
-                    $product->save();
+                    $detail->price = $detail->price + $mod;
+                    $detail->save();
 
                     $this->components->info("[$dummyCreatedAt] (+$timeMod): " . $mod);
                     break;
                 default:
                     //reset
                     $this->components->info("[$dummyCreatedAt] (+$timeMod): " . 'base / reset');
-                    $product->save();
+                    $detail->save();
                     break;
             }
         });

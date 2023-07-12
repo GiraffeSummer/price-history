@@ -18,6 +18,7 @@ use App\Console\Commands\GeneratePriceHistory;
 // return view('welcome');
 
 Route::get('/', function () {
+    dd(Product::find(1)->recommendedInventoryDetail->price);
     return 'done';
 });
 Route::get('/test', function () {
@@ -42,8 +43,8 @@ Route::get('/history/{product:id}/raw', function (Product $product) {
 Route::get('/history/{product:id}', function (Product $product) {
 
     $product = $product;
-    $history = $product->prices()->orderBy('created_at')->get();
-
+    $history = $product->prices()->orderBy('created_at')->with(['supplier'])->get();//->groupBy('supplier.id');
+    // dd($history);
     return view('chart', compact(['history', 'product']));
 });
 

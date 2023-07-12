@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Product;
-use App\Models\Supplier;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('price_history', function (Blueprint $table) {
+        Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Supplier::class);
-            $table->foreignIdFor(Product::class);
-           //$table->timestamp('created')->useCurrent();
-            $table->integer('price');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -28,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('price_history');
+        Schema::dropIfExists('suppliers');
     }
 };

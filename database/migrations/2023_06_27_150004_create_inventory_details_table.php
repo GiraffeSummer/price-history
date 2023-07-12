@@ -13,12 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('price_history', function (Blueprint $table) {
+        Schema::create('inventory_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Supplier::class);
-            $table->foreignIdFor(Product::class);
-           //$table->timestamp('created')->useCurrent();
             $table->integer('price');
+            $table->integer('stock');
+            $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(Supplier::class);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('price_history');
+        Schema::dropIfExists('inventory_details');
     }
 };
